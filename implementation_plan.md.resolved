@@ -1,0 +1,118 @@
+# Admin Backend System - Implementation Plan
+
+## Overview
+เพิ่มระบบหลังบ้านพร้อมการ Login แบ่งเป็น 3 roles:
+- **Admin** - จัดการทุกอย่าง (สินค้า, ผู้ใช้, ดูรายงาน)
+- **Employee** - ดูรายการ Order, จัดการ POS
+- **Chef** - ดู Order ที่เข้ามา (Kitchen Display)
+
+---
+
+## Proposed Changes
+
+### 1. Database
+
+#### [MODIFY] [database.sql](file:///c:/xampp/htdocs/cafe/database/database.sql)
+เพิ่ม table `users`:
+```sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,  -- hashed
+    name VARCHAR(100) NOT NULL,
+    role ENUM('admin', 'employee', 'chef') NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+### 2. Backend API
+
+#### [NEW] [authRoutes.js](file:///c:/xampp/htdocs/cafe/backend/routes/authRoutes.js)
+- `POST /api/auth/login` - Login (return JWT token)
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/logout` - Logout
+
+#### [NEW] [authMiddleware.js](file:///c:/xampp/htdocs/cafe/backend/middleware/authMiddleware.js)
+- JWT verification middleware
+- Role-based access control
+
+#### [MODIFY] [server.js](file:///c:/xampp/htdocs/cafe/backend/server.js)
+- Mount auth routes
+- Add JWT secret to config
+
+#### Dependencies เพิ่ม:
+- `jsonwebtoken` - JWT tokens
+- `bcryptjs` - Password hashing
+
+---
+
+### 3. Frontend
+
+#### [NEW] Pages:
+- `src/pages/Login.jsx` - หน้า Login
+- `src/pages/admin/Dashboard.jsx` - Admin Dashboard
+- `src/pages/admin/Products.jsx` - จัดการสินค้า
+- `src/pages/admin/Users.jsx` - จัดการผู้ใช้ (Admin only)
+- `src/pages/admin/Orders.jsx` - ดูรายการ Order
+- `src/pages/kitchen/KitchenDisplay.jsx` - หน้าจอ Chef
+
+#### [MODIFY] [App.jsx](file:///c:/xampp/htdocs/cafe/frontend/src/App.jsx)
+- เพิ่ม React Router
+- เพิ่มปุ่ม "ระบบหลังบ้าน" ใน Header
+
+#### [NEW] Components:
+- `src/components/AdminLayout.jsx` - Layout สำหรับหน้า Admin
+- `src/components/ProtectedRoute.jsx` - Route guard
+
+#### Dependencies เพิ่ม:
+- `react-router-dom` - Routing
+
+---
+
+## Role Permissions
+
+| Feature | Admin | Employee | Chef |
+|---------|-------|----------|------|
+| POS System | ✅ | ✅ | ❌ |
+| View Orders | ✅ | ✅ | ✅ |
+| Manage Products | ✅ | ❌ | ❌ |
+| Manage Users | ✅ | ❌ | ❌ |
+| Kitchen Display | ✅ | ❌ | ✅ |
+| View Reports | ✅ | ✅ | ❌ |
+
+---
+
+## Default Users (Sample)
+
+| Username | Password | Role | Name |
+|----------|----------|------|------|
+| admin | admin123 | Admin | ผู้ดูแลระบบ |
+| cashier1 | 1234 | Employee | พนักงานแคชเชียร์ |
+| chef1 | 1234 | Chef | เชฟครัว |
+
+---
+
+## UI Flow
+
+```mermaid
+flowchart TD
+    A[หน้า POS] --> B{คลิก ระบบหลังบ้าน}
+    B --> C[หน้า Login]
+    C --> D{Login สำเร็จ?}
+    D -->|Yes| E{Check Role}
+    D -->|No| C
+    E -->|Admin| F[Admin Dashboard]
+    E -->|Employee| G[Orders Page]
+    E -->|Chef| H[Kitchen Display]
+```
+
+---
+
+## Verification Plan
+1. ทดสอบ Login ด้วย user แต่ละ role
+2. ตรวจสอบ access control ว่าแต่ละ role เข้าได้เฉพาะหน้าที่กำหนด
+3. ทดสอบ Logout
+4. ทดสอบปุ่มกลับไป POS
