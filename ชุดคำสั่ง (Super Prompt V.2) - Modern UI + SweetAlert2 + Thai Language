@@ -1,0 +1,51 @@
+**Role:**
+Act as a Senior Frontend/Fullstack Developer specializing in Modern UI/UX for Web Applications.
+
+**Goal:**
+Create a Fullstack Restaurant POS System with a highly polished, modern user interface.
+
+**Tech Stack:**
+1.  **Database:** MySQL (Raw SQL or Sequelize).
+2.  **Backend:** Node.js with Express.js.
+3.  **Frontend:** React.js (Vite) + Tailwind CSS.
+4.  **UI Library:** **SweetAlert2** (for all Modals, Alerts, and Toasts).
+5.  **Icons:** Phosphor Icons or Heroicons (via React).
+
+**Design & UX Requirements (Crucial):**
+* **Language:** All user-facing text, buttons, labels, and error messages must be in **Thai (ภาษาไทย)**. (e.g., use "ชำระเงิน" instead of "Pay", "รายการอาหาร" instead of "Menu").
+* **Visual Style:** Modern, clean, and minimal. Use rounded corners (`rounded-xl`), soft shadows (`shadow-lg`), and a pleasant color palette (e.g., Primary: Orange/Coral for appetite, Background: Light Gray).
+* **SweetAlert2 Integration:**
+    * Use SweetAlert2 for the **Checkout/Payment** flow (Input field for Cash received).
+    * Use SweetAlert2 for **Success** messages (e.g., "บันทึกรายการสำเร็จ").
+    * Use SweetAlert2 for **Confirmations** (e.g., "คุณแน่ใจหรือไม่ที่จะลบรายการนี้?").
+
+**System Features:**
+
+**1. Database Schema (MySQL):**
+* `products` (id, name, price, category, image_url).
+* `orders` (id, total_price, payment_method, status, created_at).
+* `order_items` (id, order_id, product_id, quantity, price).
+
+**2. Backend (Node.js):**
+* REST API for Products (GET) and Orders (POST).
+* The Order API should handle the transaction logic.
+
+**3. Frontend (React + Tailwind):**
+* **Layout:**
+    * **Sidebar/Top:** Category filters (pill-shaped buttons).
+    * **Main Grid:** Product cards with nice hover effects.
+    * **Right Panel (Cart):** Sticky cart summary.
+* **Cart Logic:** Add/Remove items, auto-calculate Total.
+* **Checkout Process (UX Flow):**
+    1.  User clicks "ชำระเงิน" (Pay) button.
+    2.  **SweetAlert2 Modal** appears asking for "รับเงินมาเท่าไหร่?" (Cash Received) with an input field.
+    3.  System calculates Change (เงินทอน).
+    4.  **SweetAlert2 Success** shows "เงินทอน: XX บาท" and clears the cart upon confirmation.
+
+**Instruction:**
+Please implement this step-by-step.
+1.  **Step 1:** Provide **SQL Scripts** for the database.
+2.  **Step 2:** Provide **Backend API** (server.js, db connection).
+3.  **Step 3:** Provide **Frontend Components** (App.jsx, ProductCard, Cart). Focus heavily on the **Tailwind styling** and **SweetAlert2 implementation** in this step.
+
+Start with **Step 1: Database Schema**.
